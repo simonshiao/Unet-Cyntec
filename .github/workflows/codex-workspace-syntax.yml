@@ -1,10 +1,6 @@
 name: Codex Workspace syntax check
 
 on:
-  push:
-    paths:
-      - 'CodexWorkspace-v0.5.0/**'
-      - '.github/workflows/codex-workspace-syntax.yml'
   pull_request:
     paths:
       - 'CodexWorkspace-v0.5.0/**'
@@ -23,3 +19,13 @@ jobs:
         shell: pwsh
         run: |
           python -m py_compile "CodexWorkspace-v0.5.0/Codex_Workspace_v0.5.0_JSON_Engine.py"
+      - name: Create release ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "CodexWorkspace-v0.5.0/*" -DestinationPath "Codex_Workspace_v0.5.0_JSON_Engine.zip" -Force
+      - name: Upload release ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: Codex-Workspace-v0.5.0-JSON-Engine
+          path: Codex_Workspace_v0.5.0_JSON_Engine.zip
+          if-no-files-found: error
