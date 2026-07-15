@@ -5,6 +5,10 @@ on:
     paths:
       - 'CodexWorkspace-v0.5.0/**'
       - '.github/workflows/codex-workspace-syntax.yml'
+  pull_request:
+    paths:
+      - 'CodexWorkspace-v0.5.0/**'
+      - '.github/workflows/codex-workspace-syntax.yml'
   workflow_dispatch:
 
 jobs:
@@ -18,4 +22,4 @@ jobs:
       - name: Compile Python
         shell: pwsh
         run: |
-          python -m py_compile "CodexWorkspace-v0.5.0/Codex_Workspace_v0.5.0_JSON引擎版.py"
+          python -m py_compile "CodexWorkspace-v0.5.0/Codex_Workspace_v0.5.0_JSON_Engine.py"
