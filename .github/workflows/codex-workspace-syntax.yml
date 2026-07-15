@@ -19,13 +19,12 @@ jobs:
         shell: pwsh
         run: |
           python -m py_compile "CodexWorkspace-v0.5.0/Codex_Workspace_v0.5.0_JSON_Engine.py"
-      - name: Create release ZIP
-        shell: pwsh
-        run: |
-          Compress-Archive -Path "CodexWorkspace-v0.5.0/*" -DestinationPath "Codex_Workspace_v0.5.0_JSON_Engine.zip" -Force
-      - name: Upload release ZIP
+      - name: Upload ready-to-extract release
         uses: actions/upload-artifact@v4
         with:
-          name: Codex-Workspace-v0.5.0-JSON-Engine
-          path: Codex_Workspace_v0.5.0_JSON_Engine.zip
+          name: Codex-Workspace-v0.5.0-Ready
+          path: |
+            CodexWorkspace-v0.5.0/Codex_Workspace_v0.5.0_JSON_Engine.py
+            CodexWorkspace-v0.5.0/install_and_start.bat
+            CodexWorkspace-v0.5.0/README.md
           if-no-files-found: error
