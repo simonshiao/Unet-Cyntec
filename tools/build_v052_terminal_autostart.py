@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Build trigger: v0.5.2 terminal auto-start release
 from __future__ import annotations
 
 from pathlib import Path
@@ -52,7 +53,6 @@ for old, new in replacements:
         raise RuntimeError(f"找不到要替換的片段：{old[:120]}")
     text = text.replace(old, new, 1)
 
-# 在終端區標題補充自動啟動提示。
 text = text.replace(
     'powershell.exe — stable ConPTY terminal',
     'powershell.exe — stable ConPTY terminal · 開啟即自動啟動',
@@ -95,7 +95,6 @@ with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
     z.write(BAT, BAT.name)
     z.write(README, README.name)
 
-# ASCII 別名，方便直接下載。
 shutil.copy2(OUT, RELEASE / "Codex_Workspace_v0.5.2_Terminal_AutoStart.py")
 shutil.copy2(zip_path, RELEASE / "Codex_Workspace_v0.5.2_Terminal_AutoStart.zip")
 
