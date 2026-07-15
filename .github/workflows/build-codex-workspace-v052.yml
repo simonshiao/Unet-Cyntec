@@ -1,0 +1,51 @@
+name: Build Codex Workspace v0.5.2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-codex-workspace-v052.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          ref: codex-workspace-v0.5-json
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build v0.5.2
+        run: python tools/build_v052_terminal_autostart.py
+
+      - name: Verify syntax
+        run: python -m py_compile Codex_Workspace_v0.5.2_JSON引擎_終端自動啟動版.py
+
+      - name: Commit generated release
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Codex_Workspace_v0.5.2_JSON引擎_終端自動啟動版.py \
+                  安裝並啟動_v0.5.2.bat \
+                  Codex_Workspace_v0.5.2_使用說明.txt \
+                  release/Codex_Workspace_v0.5.2_JSON引擎_終端自動啟動版.zip \
+                  release/Codex_Workspace_v0.5.2_Terminal_AutoStart.py \
+                  release/Codex_Workspace_v0.5.2_Terminal_AutoStart.zip
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+          else
+            git commit -m "Build Codex Workspace v0.5.2 terminal auto-start release"
+            git push origin HEAD:codex-workspace-v0.5-json
+          fi
