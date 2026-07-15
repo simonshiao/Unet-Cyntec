@@ -1,0 +1,54 @@
+name: Package Codex Workspace v0.5.1
+
+on:
+  push:
+    branches: [codex-workspace-v0.5-json]
+    paths:
+      - 'Codex_Workspace_v0.5.1_JSON引擎_穩定終端版.py'
+      - '安裝並啟動_v0.5.1.bat'
+      - '.github/workflows/package-codex-workspace-v051.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex-workspace-v0.5-json
+      - name: Validate Python syntax
+        run: python -m py_compile 'Codex_Workspace_v0.5.1_JSON引擎_穩定終端版.py'
+      - name: Validate embedded JavaScript
+        shell: python
+        run: |
+          import re
+          from pathlib import Path
+          source = Path('Codex_Workspace_v0.5.1_JSON引擎_穩定終端版.py').read_text(encoding='utf-8')
+          match = re.search(r'<script>\n(.*?)\n</script>', source, re.S)
+          if not match:
+              raise SystemExit('embedded JavaScript not found')
+          Path('/tmp/codex_workspace_v051.js').write_text(match.group(1), encoding='utf-8')
+      - run: node --check /tmp/codex_workspace_v051.js
+      - name: Build release ZIP
+        run: |
+          rm -rf /tmp/Codex_Workspace_v0.5.1_JSON引擎_穩定終端版
+          mkdir -p /tmp/Codex_Workspace_v0.5.1_JSON引擎_穩定終端版
+          cp 'Codex_Workspace_v0.5.1_JSON引擎_穩定終端版.py' /tmp/Codex_Workspace_v0.5.1_JSON引擎_穩定終端版/
+          cp '安裝並啟動_v0.5.1.bat' /tmp/Codex_Workspace_v0.5.1_JSON引擎_穩定終端版/
+          printf '%s\n' 'Codex Workspace v0.5.1｜JSON 引擎＋穩定終端版' '' '使用方式：解壓後雙擊「安裝並啟動_v0.5.1.bat」。' '主聊天使用 codex exec --json；右上角 >_ 為獨立穩定 PowerShell 終端。' > /tmp/Codex_Workspace_v0.5.1_JSON引擎_穩定終端版/README.txt
+          cd /tmp
+          zip -r '/tmp/Codex_Workspace_v0.5.1_JSON引擎_穩定終端版.zip' 'Codex_Workspace_v0.5.1_JSON引擎_穩定終端版'
+          cd "$GITHUB_WORKSPACE"
+          mkdir -p release
+          cp '/tmp/Codex_Workspace_v0.5.1_JSON引擎_穩定終端版.zip' 'release/Codex_Workspace_v0.5.1_JSON引擎_穩定終端版.zip'
+      - name: Commit release ZIP
+        run: |
+          git config user.name 'Codex Workspace Builder'
+          git config user.email 'actions@users.noreply.github.com'
+          git add 'release/Codex_Workspace_v0.5.1_JSON引擎_穩定終端版.zip'
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Build Codex Workspace v0.5.1 release ZIP'
+          git push origin HEAD:codex-workspace-v0.5-json
